@@ -39,16 +39,25 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    // Check if the admin exists with the provided email
     const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });
     }
 
+    // Check if the password matches
     const isMatch = await comparePassword(password, admin.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    // Generate token for the logged-in admin
     const token = generateToken(admin._id);
     res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
