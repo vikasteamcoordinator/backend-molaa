@@ -38,8 +38,8 @@ exports.signup = async (req, res) => {
 // Admin Login
 exports.login = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const admin = await Admin.findOne({ username });
+    const { email, password } = req.body;
+    const admin = await Admin.findOne({ email });
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });
     }
