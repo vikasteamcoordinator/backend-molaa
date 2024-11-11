@@ -12,8 +12,8 @@ const router = express.Router();
 
 router.post('/signup', signup);                
 router.post('/login', login);                 
-router.get('/', authMiddleware, getAllUsers); 
-router.get('/:id', authMiddleware, getUserById); 
-router.put('/:id', authMiddleware, updateUser); 
+router.get('/alluser', authMiddleware, getAllUsers); 
+router.get('/singleuser/:id', authMiddleware, getUserById); 
+router.put('/updateuser/:id', authMiddleware, updateUser); 
 
 module.exports = router;

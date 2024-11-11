@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.post('/signup', signup);               
 router.post('/login', login);                 
-router.get('/', authMiddleware, getAllAdmins); 
-router.get('/:id', authMiddleware, getAdminById); 
-router.put('/:id', authMiddleware, updateAdmin); 
+router.get('/alladmin', authMiddleware, getAllAdmins); 
+router.get('/singleadmin/:id', authMiddleware, getAdminById); 
+router.put('/updateadmin/:id', authMiddleware, updateAdmin); 
 module.exports = router;

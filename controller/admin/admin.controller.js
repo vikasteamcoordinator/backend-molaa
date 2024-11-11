@@ -5,11 +5,11 @@ const { generateToken } = require('../../utils/jwt.js');
 // Admin Signup
 exports.signup = async (req, res) => {
   try {
-    const { username, password, email } = req.body;
+    const { username, password, email, lastName, firstName, contactNumber } = req.body;
     if (!username || !password || !email) {
       return res.status(400).json({ message: 'Username, email, and password are required' });
     }
-    
+
     // Check if the email already exists
     const existingAdmin = await Admin.findOne({ email });
     if (existingAdmin) {
@@ -17,29 +17,42 @@ exports.signup = async (req, res) => {
     }
 
     const hashedPassword = await hashPassword(password);
-    const admin = new Admin({ username, password: hashedPassword, email });
+    const admin = new Admin({
+      username,
+      password: hashedPassword,
+      email,
+      firstName,
+      lastName,
+      contactNumber
+    });
     await admin.save();
-    res.status(201).json({ message: 'Admin created successfully' ,data : admin});
+
+    // Generate token
+    const token = generateToken(admin._id);
+    res.status(201).json({ message: 'Admin created successfully', data: admin, token });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: `Error creating admin: ${error.message}` });
   }
 };
-
 
 // Admin Login
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const admin = await Admin.findOne({ username });
-    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
 
     const isMatch = await comparePassword(password, admin.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
     const token = generateToken(admin._id);
     res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: `Error logging in: ${error.message}` });
   }
 };
 
@@ -49,7 +62,7 @@ exports.getAllAdmins = async (req, res) => {
     const admins = await Admin.find();
     res.status(200).json(admins);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: `Error fetching admins: ${error.message}` });
   }
 };
 
@@ -57,10 +70,12 @@ exports.getAllAdmins = async (req, res) => {
 exports.getAdminById = async (req, res) => {
   try {
     const admin = await Admin.findById(req.params.id);
-    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
     res.status(200).json(admin);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: `Error fetching admin: ${error.message}` });
   }
 };
 
@@ -68,8 +83,11 @@ exports.getAdminById = async (req, res) => {
 exports.updateAdmin = async (req, res) => {
   try {
     const updatedAdmin = await Admin.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.status(200).json(updatedAdmin);
+    if (!updatedAdmin) {
+      return res.status(404).json({ message: 'Admin not found' });
+    }
+    res.status(200).json({ message: 'Admin updated successfully', data: updatedAdmin });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: `Error updating admin: ${error.message}` });
   }
 };
