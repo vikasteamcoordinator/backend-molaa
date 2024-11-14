@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors'); // Import the CORS middleware
+const cors = require('cors'); 
 const app = express();
 
 // Load config from env file
@@ -15,6 +15,7 @@ app.use(cors({
 
 // Middleware to parse JSON requests
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // Import routes
 const admin = require("./router/admin/admin.route.js");
