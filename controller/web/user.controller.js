@@ -1,7 +1,6 @@
 const User = require('../../Models/web/user.model.js');
 const { hashPassword, comparePassword } = require('../../utils/bcrypt.js');
 const { generateToken } = require('../../utils/jwt.js');
-const upload = require('../../utils/multer.js');
 // User Signup
 // exports.signup = async (req, res) => {
 //   try {
@@ -37,36 +36,33 @@ const upload = require('../../utils/multer.js');
 //   }
 // };
 exports.signup = async (req, res) => {
-  upload.single('photo')(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ message: err.message });
+  try {
+    const { photo, name, email, username, password } = req.body;
+
+    if (!username) {
+      return res.status(400).json({ message: 'Username is required' });
     }
-    try {
-      const { name, email, username, password } = req.body;
-      if (!username) {
-        return res.status(400).json({ message: 'Username is required' });
-      }
 
-      const existingUser = await User.findOne({ username });
-      if (existingUser) {
-        return res.status(400).json({ message: 'Username already exists' });
-      }
-
-      const hashedPassword = await hashPassword(password);
-      const user = new User({
-        name,
-        email,
-        username,
-        password: hashedPassword,
-        photo: req.file ? req.file.path : null, // Store the image path
-      });
-
-      await user.save();
-      res.status(201).json({ message: 'User created successfully', data: user });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Username already exists' });
     }
-  });
+
+    const hashedPassword = await hashPassword(password);
+
+    const user = new User({
+      name,
+      email,
+      username,
+      password: hashedPassword,
+      photo: photo // Save the base64 image data directly
+    });
+
+    await user.save();
+    res.status(201).json({ message: 'User created successfully', data: user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // User Login

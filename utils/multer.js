@@ -1,11 +1,10 @@
-// utils/multer.js
 const multer = require('multer');
 const path = require('path');
 
-// Set storage engine
+// Set storage engine with absolute path
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Specify the folder to store images
+    cb(null, path.join(__dirname, '../uploads')); // Adjusted path to be absolute
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`);
