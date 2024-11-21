@@ -67,6 +67,7 @@ exports.login = async (req, res) => {
     // Generate token
     const token = generateToken(admin._id);
 
+    // Respond with user data and token
     res.status(200).json({
       message: 'Login successful',
       token,
