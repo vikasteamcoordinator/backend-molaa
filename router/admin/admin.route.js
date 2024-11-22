@@ -6,8 +6,14 @@ const {
   getAdminById,
   updateAdmin
 } = require('../../controller/admin/admin.controller.js');
+const {
+  uploadLogo,
+  getAllLogos,
+  getLogoById,
+  updateLogo,
+  deleteLogo,
+} = require('../../controller/admin/logo/logo.controller.js');
 const authMiddleware = require('../../middleware/auth.js');
-const { upload , uploadLogo } = require("../../controller/admin/logo/logo.controller.js");
 const bannerController = require('../../controller/admin/offer/offer.controller.js');
 const router = express.Router();
 
@@ -17,7 +23,11 @@ router.get('/alladmin', authMiddleware, getAllAdmins);
 router.get('/singleadmin/:id', authMiddleware, getAdminById); 
 router.put('/updateadmin/:id', authMiddleware, updateAdmin); 
 //logo
-router.post("/upload", upload.single("logo"), uploadLogo); 
+router.post('/uploadlogo', uploadLogo);
+router.get('/logos', getAllLogos);
+router.get('/logo/:id', getLogoById);
+router.put('/logo/:id', updateLogo);
+router.delete('/logo/:id', deleteLogo);
 //banner image 
 router.post('/createBanner', bannerController.upload.single('image'), bannerController.createBanner);
 router.get('/getBanner', bannerController.getBanners);

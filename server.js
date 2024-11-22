@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors'); 
 const app = express();
+const bodyParser = require('body-parser');
 
 // Load config from env file
 require("dotenv").config();
@@ -15,7 +16,9 @@ app.use(cors({
 
 // Middleware to parse JSON requests
 app.use(express.json());
-app.use('/uploads', express.static('uploads'));
+app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Import routes
 const admin = require("./router/admin/admin.route.js");

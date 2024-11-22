@@ -35,13 +35,7 @@ exports.signup = async (req, res) => {
 
     res.status(201).json({
       message: 'Admin created successfully',
-      data: {
-        id: admin._id,
-        email: admin.email,
-        firstName,
-        lastName,
-        contact,
-      },
+      data: { id: admin._id, email: admin.email, firstName, lastName, contact },
       token,
     });
   } catch (error) {
@@ -77,13 +71,7 @@ exports.login = async (req, res) => {
     res.status(200).json({
       message: 'Login successful',
       token,
-      data: {
-        id: admin._id,
-        email: admin.email,
-        firstName: admin.firstName,
-        lastName: admin.lastName,
-        contact: admin.contact,
-      },
+      data: { id: admin._id, email: admin.email, firstName: admin.firstName, lastName: admin.lastName },
     });
   } catch (error) {
     res.status(500).json({ message: `Error logging in: ${error.message}` });
@@ -93,7 +81,7 @@ exports.login = async (req, res) => {
 // Get All Admins
 exports.getAllAdmins = async (req, res) => {
   try {
-    const admins = await Admin.find({}, '-password'); // Exclude the password field
+    const admins = await Admin.find({}, '-password');
     res.status(200).json(admins);
   } catch (error) {
     res.status(500).json({ message: `Error fetching admins: ${error.message}` });
@@ -103,7 +91,7 @@ exports.getAllAdmins = async (req, res) => {
 // Get Admin by ID
 exports.getAdminById = async (req, res) => {
   try {
-    const admin = await Admin.findById(req.params.id, '-password'); // Exclude the password field
+    const admin = await Admin.findById(req.params.id, '-password');
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });
     }
@@ -116,26 +104,18 @@ exports.getAdminById = async (req, res) => {
 // Update Admin
 exports.updateAdmin = async (req, res) => {
   try {
-    const { password } = req.body;
+    const { email, password, firstName, lastName, contact } = req.body;
 
     if (password) {
-      req.body.password = await hashPassword(password); // Re-hash the password if updated
+      req.body.password = await hashPassword(password); // Re-hash the new password if updated
     }
 
-    const updatedAdmin = await Admin.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true } // Apply validators and return updated document
-    ).select('-password'); // Exclude password
-
+    const updatedAdmin = await Admin.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true }).select('-password');
     if (!updatedAdmin) {
       return res.status(404).json({ message: 'Admin not found' });
     }
 
-    res.status(200).json({
-      message: 'Admin updated successfully',
-      data: updatedAdmin,
-    });
+    res.status(200).json({ message: 'Admin updated successfully', data: updatedAdmin });
   } catch (error) {
     res.status(500).json({ message: `Error updating admin: ${error.message}` });
   }
