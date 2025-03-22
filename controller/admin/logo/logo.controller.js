@@ -27,4 +27,20 @@ const uploadLogo = async (req, res) => {
   }
 };
 
-module.exports = { upload, uploadLogo };
+const getLogo = async (req, res) => {
+  try {
+    // Fetch the latest logo (you can modify this logic as needed)
+    const logo = await Logo.findOne().sort({ createdAt: -1 }).exec();
+
+    if (!logo) {
+      return res.status(404).json({ message: "Logo not found" });
+    }
+
+    // Send the logo path or the logo itself
+    res.status(200).json({ logoPath: logo.logo });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch logo" });
+  }
+};
+
+module.exports = { upload, uploadLogo , getLogo };
