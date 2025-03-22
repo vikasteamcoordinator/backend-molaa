@@ -1,6 +1,7 @@
 const User = require('../../Models/web/user.model.js');
 const { hashPassword, comparePassword } = require('../../utils/bcrypt.js');
 const { generateToken } = require('../../utils/jwt.js');
+
 // User Signup
 // exports.signup = async (req, res) => {
 //   try {
@@ -13,31 +14,9 @@ const { generateToken } = require('../../utils/jwt.js');
 //     res.status(500).json({ message: error.message });
 //   }
 // };
-// exports.signup = async (req, res) => {
-//   try {
-//     const { photo, name, email, username, password } = req.body; // Include 'username' if it's a required field
-
-//     if (!username) {
-//       return res.status(400).json({ message: 'Username is required' });
-//     }
-
-//     const existingUser = await User.findOne({ username });
-//     if (existingUser) {
-//       return res.status(400).json({ message: 'Username already exists' });
-//     }
-
-//     const hashedPassword = await hashPassword(password);
-//     const user = new User({ photo, name, email, username, password: hashedPassword });
-//     await user.save();
-    
-//     res.status(201).json({ message: 'User created successfully', data: user });
-//   } catch (error) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
 exports.signup = async (req, res) => {
   try {
-    const { photo, name, email, username, password } = req.body;
+    const { photo, name, email, username, password } = req.body; // Include 'username' if it's a required field
 
     if (!username) {
       return res.status(400).json({ message: 'Username is required' });
@@ -49,21 +28,15 @@ exports.signup = async (req, res) => {
     }
 
     const hashedPassword = await hashPassword(password);
-
-    const user = new User({
-      name,
-      email,
-      username,
-      password: hashedPassword,
-      photo: photo // Save the base64 image data directly
-    });
-
+    const user = new User({ photo, name, email, username, password: hashedPassword });
     await user.save();
+    
     res.status(201).json({ message: 'User created successfully', data: user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // User Login
 exports.login = async (req, res) => {
